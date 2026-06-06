@@ -1,0 +1,188 @@
+<!DOCTYPE html>
+<html lang="ko">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>나만의 자산 포트폴리오</title>
+    <style>
+        body { font-family: 'Malgun Gothic', sans-serif; background-color: #f4f7f6; color: #333; margin: 0; padding: 20px; }
+        .container { max-width: 800px; margin: 0 auto; background: white; padding: 20px; border-radius: 10px; box-shadow: 0 4px 8px rgba(0,0,0,0.1); }
+        h1, h2 { color: #2c3e50; }
+        .section { margin-bottom: 30px; padding: 20px; background: #eef2f5; border-radius: 8px; }
+        label { display: block; margin-top: 10px; font-weight: bold; }
+        input { width: 100%; padding: 8px; margin-top: 5px; box-sizing: border-box; border: 1px solid #ccc; border-radius: 4px; }
+        button { margin-top: 15px; padding: 10px 15px; background-color: #3498db; color: white; border: none; border-radius: 5px; cursor: pointer; font-size: 16px; width: 100%; font-weight: bold; }
+        button:hover { background-color: #2980b9; }
+        .result-box { background-color: #dff0d8; padding: 15px; border-radius: 8px; margin-top: 20px; border: 1px solid #d6e9c6; }
+        .result-item { font-size: 18px; margin-bottom: 10px; }
+        .highlight { font-weight: bold; color: #e74c3c; font-size: 20px; }
+        table { width: 100%; border-collapse: collapse; margin-top: 10px; background: white; }
+        th, td { border: 1px solid #ccc; padding: 10px; text-align: center; }
+        th { background-color: #bdc3c7; }
+        .danger-btn { background-color: #e74c3c; }
+        .danger-btn:hover { background-color: #c0392b; }
+        .success-btn { background-color: #27ae60; }
+        .success-btn:hover { background-color: #2ecc71; }
+    </style>
+</head>
+<body>
+
+<div class="container">
+    <h1>💰 나만의 자산 포트폴리오</h1>
+
+    <div class="section">
+        <h2>1. 월별 투자 원금 입력</h2>
+        <label for="month">월 입력 (예: 1월)</label>
+        <input type="text" id="month" placeholder="몇 월인가요?">
+        
+        <label for="salary">해당 월 총 월급 (원)</label>
+        <input type="number" id="salary" value="0">
+        
+        <label for="savingsInput">적금 넣은 원금 (원)</label>
+        <input type="number" id="savingsInput" value="0">
+        
+        <label for="stockInput">주식계좌 넣은 원금 (원)</label>
+        <input type="number" id="stockInput" value="0">
+        
+        <button onclick="addMonthlyData()">이번 달 데이터 저장하기</button>
+    </div>
+
+    <div class="section">
+        <h2>📅 올해 누적 기록 (자동 저장)</h2>
+        <table>
+            <thead>
+                <tr>
+                    <th>월</th>
+                    <th>월급</th>
+                    <th>적금 원금</th>
+                    <th>주식 원금</th>
+                </tr>
+            </thead>
+            <tbody id="historyTable">
+            </tbody>
+        </table>
+        <p style="font-size: 18px; margin-top: 15px;">현재까지 총 투자 원금: <span id="totalPrincipal" class="highlight">0</span> 원</p>
+        <button onclick="clearData()" class="danger-btn">기록 전체 초기화 (새해 시작)</button>
+    </div>
+
+    <div class="section">
+        <h2>2. 연말 자산 평가 및 목표 확인</h2>
+        <label for="currentSavings">현재 총 예적금 잔액 (원)</label>
+        <input type="number" id="currentSavings" value="0">
+        
+        <label for="currentStock">현재 주식 총 평가금액 (원)</label>
+        <input type="number" id="currentStock" value="0">
+
+        <label for="targetAsset">올해 희망 목표 자산 금액 (원)</label>
+        <input type="number" id="targetAsset" value="0">
+        
+        <button onclick="calculatePortfolio()" class="success-btn">자산 결과 분석하기</button>
+    </div>
+
+    <div id="resultSection" class="result-box" style="display: none;">
+        <h2>📊 자산 분석 결과</h2>
+        <div class="result-item">올해 총 투자 원금: <span id="resTotalInvest" class="highlight">0</span> 원</div>
+        <div class="result-item">현재 총 자산 (예적금+주식): <span id="resTotalAsset" class="highlight">0</span> 원</div>
+        <div class="result-item">순이익 (이자+주식수익): <span id="resNetProfit" class="highlight">0</span> 원</div>
+        <div class="result-item">자산 증가율 (투자원금 대비): <span id="resGrowthRate" class="highlight">0</span> %</div>
+        <div class="result-item">투자 수익률: <span id="resROI" class="highlight">0</span> %</div>
+        <hr style="border:1px solid #d6e9c6;">
+        <div class="result-item">올해 목표 자산: <span id="resTarget" class="highlight">0</span> 원</div>
+        <div class="result-item">목표까지 부족한 금액: <span id="resShortfall" class="highlight">0</span> 원</div>
+        <div class="result-item">목표 달성에 필요했던 수익률: <span id="resRequiredROI" class="highlight">0</span> %</div>
+    </div>
+</div>
+
+<script>
+    window.onload = function() { renderHistory(); };
+
+    function addMonthlyData() {
+        const month = document.getElementById('month').value;
+        const salary = Number(document.getElementById('salary').value);
+        const savings = Number(document.getElementById('savingsInput').value);
+        const stock = Number(document.getElementById('stockInput').value);
+
+        if (!month) { alert('월을 입력해주세요!'); return; }
+
+        let records = JSON.parse(localStorage.getItem('myAssetData')) || [];
+        records.push({ month, salary, savings, stock });
+        localStorage.setItem('myAssetData', JSON.stringify(records));
+        
+        alert(month + ' 데이터가 저장되었습니다!');
+        document.getElementById('month').value = '';
+        document.getElementById('salary').value = '0';
+        document.getElementById('savingsInput').value = '0';
+        document.getElementById('stockInput').value = '0';
+        renderHistory();
+    }
+
+    function renderHistory() {
+        let records = JSON.parse(localStorage.getItem('myAssetData')) || [];
+        const tbody = document.getElementById('historyTable');
+        tbody.innerHTML = '';
+        let totalPrincipal = 0;
+
+        records.forEach(record => {
+            let row = `<tr>
+                <td>${record.month}</td>
+                <td>${record.salary.toLocaleString()}</td>
+                <td>${record.savings.toLocaleString()}</td>
+                <td>${record.stock.toLocaleString()}</td>
+            </tr>`;
+            tbody.innerHTML += row;
+            totalPrincipal += (record.savings + record.stock);
+        });
+        document.getElementById('totalPrincipal').innerText = totalPrincipal.toLocaleString();
+    }
+
+    function clearData() {
+        if(confirm('정말 모든 기록을 지우시겠습니까? 복구할 수 없습니다.')) {
+            localStorage.removeItem('myAssetData');
+            renderHistory();
+            document.getElementById('resultSection').style.display = 'none';
+        }
+    }
+
+    function calculatePortfolio() {
+        let records = JSON.parse(localStorage.getItem('myAssetData')) || [];
+        let totalInvested = records.reduce((sum, record) => sum + record.savings + record.stock, 0);
+        
+        const currentSavings = Number(document.getElementById('currentSavings').value);
+        const currentStock = Number(document.getElementById('currentStock').value);
+        const targetAsset = Number(document.getElementById('targetAsset').value);
+
+        const totalAsset = currentSavings + currentStock; 
+        const netProfit = totalAsset - totalInvested; 
+        
+        let growthRate = 0;
+        let roi = 0;
+        if (totalInvested > 0) {
+            growthRate = ((totalAsset - totalInvested) / totalInvested) * 100;
+            roi = (netProfit / totalInvested) * 100; 
+        }
+
+        const shortfall = targetAsset - totalAsset; 
+        
+        let requiredROI = 0;
+        if (totalInvested > 0 && targetAsset > totalInvested) {
+            requiredROI = ((targetAsset - totalInvested) / totalInvested) * 100;
+        }
+
+        document.getElementById('resTotalInvest').innerText = totalInvested.toLocaleString();
+        document.getElementById('resTotalAsset').innerText = totalAsset.toLocaleString();
+        document.getElementById('resNetProfit').innerText = netProfit.toLocaleString();
+        document.getElementById('resGrowthRate').innerText = growthRate.toFixed(2);
+        document.getElementById('resROI').innerText = roi.toFixed(2);
+        document.getElementById('resTarget').innerText = targetAsset.toLocaleString();
+        
+        if (shortfall > 0) {
+            document.getElementById('resShortfall').innerText = shortfall.toLocaleString();
+        } else {
+            document.getElementById('resShortfall').innerText = "0 (목표 달성! 🎉)";
+        }
+        document.getElementById('resRequiredROI').innerText = requiredROI.toFixed(2);
+        document.getElementById('resultSection').style.display = 'block';
+    }
+</script>
+</body>
+</html>
