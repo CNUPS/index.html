@@ -3,185 +3,249 @@
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>나만의 자산 포트폴리오</title>
+    <title>나만의 자산 포트폴리오 프로</title>
+    <script src="https://cdn.jsdelivr.net/npm/chart.js"></script>
     <style>
-        body { font-family: 'Malgun Gothic', sans-serif; background-color: #f4f7f6; color: #333; margin: 0; padding: 20px; }
-        .container { max-width: 800px; margin: 0 auto; background: white; padding: 20px; border-radius: 10px; box-shadow: 0 4px 8px rgba(0,0,0,0.1); }
-        h1, h2 { color: #2c3e50; }
-        .section { margin-bottom: 30px; padding: 20px; background: #eef2f5; border-radius: 8px; }
-        label { display: block; margin-top: 10px; font-weight: bold; }
-        input { width: 100%; padding: 8px; margin-top: 5px; box-sizing: border-box; border: 1px solid #ccc; border-radius: 4px; }
-        button { margin-top: 15px; padding: 10px 15px; background-color: #3498db; color: white; border: none; border-radius: 5px; cursor: pointer; font-size: 16px; width: 100%; font-weight: bold; }
-        button:hover { background-color: #2980b9; }
-        .result-box { background-color: #dff0d8; padding: 15px; border-radius: 8px; margin-top: 20px; border: 1px solid #d6e9c6; }
-        .result-item { font-size: 18px; margin-bottom: 10px; }
-        .highlight { font-weight: bold; color: #e74c3c; font-size: 20px; }
-        table { width: 100%; border-collapse: collapse; margin-top: 10px; background: white; }
-        th, td { border: 1px solid #ccc; padding: 10px; text-align: center; }
-        th { background-color: #bdc3c7; }
-        .danger-btn { background-color: #e74c3c; }
-        .danger-btn:hover { background-color: #c0392b; }
-        .success-btn { background-color: #27ae60; }
-        .success-btn:hover { background-color: #2ecc71; }
+        body { font-family: 'Malgun Gothic', sans-serif; background-color: #f0f4f8; color: #333; margin: 0; padding: 20px; }
+        .container { max-width: 900px; margin: 0 auto; background: white; padding: 25px; border-radius: 12px; box-shadow: 0 5px 15px rgba(0,0,0,0.05); }
+        h1 { color: #1a365d; text-align: center; border-bottom: 2px solid #e2e8f0; padding-bottom: 10px; }
+        h2 { color: #2b6cb0; border-left: 4px solid #3182ce; padding-left: 10px; margin-top: 30px; }
+        .section { margin-bottom: 30px; padding: 20px; background: #f7fafc; border-radius: 8px; border: 1px solid #e2e8f0; }
+        .grid-2 { display: grid; grid-template-columns: 1fr 1fr; gap: 15px; }
+        label { display: block; margin-top: 10px; font-weight: bold; font-size: 14px; color: #4a5568; }
+        input { width: 100%; padding: 10px; margin-top: 5px; box-sizing: border-box; border: 1px solid #cbd5e0; border-radius: 6px; font-size: 16px; }
+        button { margin-top: 20px; padding: 12px; background-color: #3182ce; color: white; border: none; border-radius: 6px; cursor: pointer; font-size: 16px; font-weight: bold; width: 100%; transition: 0.2s; }
+        button:hover { background-color: #2b6cb0; }
+        .danger-btn { background-color: #e53e3e; margin-top: 10px; }
+        .danger-btn:hover { background-color: #c53030; }
+        table { width: 100%; border-collapse: collapse; margin-top: 15px; background: white; font-size: 14px; }
+        th, td { border: 1px solid #e2e8f0; padding: 10px; text-align: center; }
+        th { background-color: #edf2f7; color: #4a5568; }
+        .profit { color: #38a169; font-weight: bold; }
+        .loss { color: #e53e3e; font-weight: bold; }
+        .summary-box { background: linear-gradient(135deg, #ebf8ff 0%, #bee3f8 100%); padding: 20px; border-radius: 8px; margin-top: 20px; border: 1px solid #90cdf4; }
+        .summary-item { font-size: 16px; margin-bottom: 12px; display: flex; justify-content: space-between; border-bottom: 1px dashed #90cdf4; padding-bottom: 5px; }
+        .highlight { font-weight: bold; color: #2b6cb0; font-size: 18px; }
+        .chart-container { position: relative; height: 300px; width: 100%; margin-top: 20px; }
     </style>
 </head>
 <body>
 
 <div class="container">
-    <h1>💰 나만의 자산 포트폴리오</h1>
+    <h1>📈 나만의 자산 포트폴리오 PRO</h1>
 
     <div class="section">
-        <h2>1. 월별 투자 원금 입력</h2>
-        <label for="month">월 입력 (예: 1월)</label>
-        <input type="text" id="month" placeholder="몇 월인가요?">
-        
-        <label for="salary">해당 월 총 월급 (원)</label>
-        <input type="number" id="salary" value="0">
-        
-        <label for="savingsInput">적금 넣은 원금 (원)</label>
-        <input type="number" id="savingsInput" value="0">
-        
-        <label for="stockInput">주식계좌 넣은 원금 (원)</label>
-        <input type="number" id="stockInput" value="0">
-        
-        <button onclick="addMonthlyData()">이번 달 데이터 저장하기</button>
+        <h2>1. 이번 달 자산 현황 입력</h2>
+        <div class="grid-2">
+            <div>
+                <label>월 (예: 1월)</label>
+                <input type="text" id="month" placeholder="몇 월인가요?">
+                <label>이번 달 총 월급 (원)</label>
+                <input type="number" id="salary" value="0">
+                <label>이번 달 적금 넣은 금액 (원)</label>
+                <input type="number" id="savingsInput" value="0">
+                <label>이번 달 주식계좌 넣은 원금 (원)</label>
+                <input type="number" id="stockInput" value="0">
+            </div>
+            <div>
+                <label>현재 예적금 총 잔액 (원)</label>
+                <input type="number" id="currentTotalSavings" value="0" placeholder="통장에 찍힌 총액">
+                <label>현재 주식 총 평가금액 (원)</label>
+                <input type="number" id="currentTotalStock" value="0" placeholder="주식앱에 찍힌 총액">
+            </div>
+        </div>
+        <button onclick="addMonthlyData()">이번 달 데이터 저장 및 분석하기</button>
     </div>
 
     <div class="section">
-        <h2>📅 올해 누적 기록 (자동 저장)</h2>
-        <table>
-            <thead>
-                <tr>
-                    <th>월</th>
-                    <th>월급</th>
-                    <th>적금 원금</th>
-                    <th>주식 원금</th>
-                </tr>
-            </thead>
-            <tbody id="historyTable">
-            </tbody>
-        </table>
-        <p style="font-size: 18px; margin-top: 15px;">현재까지 총 투자 원금: <span id="totalPrincipal" class="highlight">0</span> 원</p>
-        <button onclick="clearData()" class="danger-btn">기록 전체 초기화 (새해 시작)</button>
+        <h2>📅 월별 누적 기록 및 흐름</h2>
+        <div class="chart-container">
+            <canvas id="assetChart"></canvas>
+        </div>
+        <div style="overflow-x: auto;">
+            <table>
+                <thead>
+                    <tr>
+                        <th>월</th>
+                        <th>월급</th>
+                        <th>투자원금(월)</th>
+                        <th>주식평가액</th>
+                        <th>총 자산</th>
+                        <th>이번 달 주식수익</th>
+                    </tr>
+                </thead>
+                <tbody id="historyTable"></tbody>
+            </table>
+        </div>
+        <button onclick="clearData()" class="danger-btn">기록 전체 초기화</button>
     </div>
 
-    <div class="section">
-        <h2>2. 연말 자산 평가 및 목표 확인</h2>
-        <label for="currentSavings">현재 총 예적금 잔액 (원)</label>
-        <input type="number" id="currentSavings" value="0">
+    <div class="summary-box" id="yearEndSummary" style="display: none;">
+        <h2>🏆 올해 연말 정산 리포트</h2>
         
-        <label for="currentStock">현재 주식 총 평가금액 (원)</label>
-        <input type="number" id="currentStock" value="0">
-
-        <label for="targetAsset">올해 희망 목표 자산 금액 (원)</label>
-        <input type="number" id="targetAsset" value="0">
+        <div class="summary-item"><span>올해 번 총 월급:</span> <span id="sumSalary" class="highlight">0 원</span></div>
+        <div class="summary-item"><span>올해 넣은 총 투자원금 (적금+주식):</span> <span id="sumInvest" class="highlight">0 원</span></div>
+        <hr style="border:1px solid #90cdf4;">
         
-        <button onclick="calculatePortfolio()" class="success-btn">자산 결과 분석하기</button>
-    </div>
-
-    <div id="resultSection" class="result-box" style="display: none;">
-        <h2>📊 자산 분석 결과</h2>
-        <div class="result-item">올해 총 투자 원금: <span id="resTotalInvest" class="highlight">0</span> 원</div>
-        <div class="result-item">현재 총 자산 (예적금+주식): <span id="resTotalAsset" class="highlight">0</span> 원</div>
-        <div class="result-item">순이익 (이자+주식수익): <span id="resNetProfit" class="highlight">0</span> 원</div>
-        <div class="result-item">자산 증가율 (투자원금 대비): <span id="resGrowthRate" class="highlight">0</span> %</div>
-        <div class="result-item">투자 수익률: <span id="resROI" class="highlight">0</span> %</div>
-        <hr style="border:1px solid #d6e9c6;">
-        <div class="result-item">올해 목표 자산: <span id="resTarget" class="highlight">0</span> 원</div>
-        <div class="result-item">목표까지 부족한 금액: <span id="resShortfall" class="highlight">0</span> 원</div>
-        <div class="result-item">목표 달성에 필요했던 수익률: <span id="resRequiredROI" class="highlight">0</span> %</div>
+        <h3>📊 주식 투자 성과</h3>
+        <p style="font-size: 12px; color: #718096; margin-top:-10px;">계산식: 연말 주식평가액 - (연초 주식평가액 + 올해 총 주식투자원금)</p>
+        <div class="summary-item"><span>올해 순수 주식 수익금:</span> <span id="annualStockProfit" class="highlight">0 원</span></div>
+        <div class="summary-item"><span>전재산 기준 주식 수익률:</span> <span id="stockYieldTotal" class="highlight">0 %</span></div>
+        
+        <hr style="border:1px solid #90cdf4;">
+        
+        <h3>🚀 자산 성장 지표</h3>
+        <p style="font-size: 12px; color: #718096; margin-top:-10px;">연초(첫 기록) 대비 연말(마지막 기록) 전재산 비교</p>
+        <div class="summary-item"><span>연초 총 자산:</span> <span id="startAsset" class="highlight">0 원</span></div>
+        <div class="summary-item"><span>연말(현재) 총 자산:</span> <span id="endAsset" class="highlight">0 원</span></div>
+        <div class="summary-item"><span>올해 자산 증가 금액:</span> <span id="assetGrowthAmount" class="highlight">0 원</span></div>
+        <div class="summary-item"><span>올해 총 자산 증가율:</span> <span id="assetGrowthRate" class="highlight">0 %</span></div>
     </div>
 </div>
 
 <script>
-    window.onload = function() { renderHistory(); };
+    let myChart = null; // 그래프 객체
+
+    window.onload = function() { renderDashboard(); };
 
     function addMonthlyData() {
         const month = document.getElementById('month').value;
         const salary = Number(document.getElementById('salary').value);
-        const savings = Number(document.getElementById('savingsInput').value);
-        const stock = Number(document.getElementById('stockInput').value);
+        const savingsInput = Number(document.getElementById('savingsInput').value);
+        const stockInput = Number(document.getElementById('stockInput').value);
+        const currentTotalSavings = Number(document.getElementById('currentTotalSavings').value);
+        const currentTotalStock = Number(document.getElementById('currentTotalStock').value);
 
         if (!month) { alert('월을 입력해주세요!'); return; }
 
-        let records = JSON.parse(localStorage.getItem('myAssetData')) || [];
-        records.push({ month, salary, savings, stock });
-        localStorage.setItem('myAssetData', JSON.stringify(records));
+        let records = JSON.parse(localStorage.getItem('proAssetData')) || [];
         
-        alert(month + ' 데이터가 저장되었습니다!');
-        document.getElementById('month').value = '';
-        document.getElementById('salary').value = '0';
-        document.getElementById('savingsInput').value = '0';
-        document.getElementById('stockInput').value = '0';
-        renderHistory();
+        // 이번 달 주식 수익 계산: 이번달 평가액 - (저번달 평가액 + 이번달 원금)
+        let monthlyStockProfit = 0;
+        if (records.length > 0) {
+            const lastRecord = records[records.length - 1];
+            monthlyStockProfit = currentTotalStock - (lastRecord.currentTotalStock + stockInput);
+        } else {
+            // 첫 달인 경우 (기존에 가지고 있던 주식액이 없다고 가정)
+            monthlyStockProfit = currentTotalStock - stockInput; 
+        }
+
+        const totalAsset = currentTotalSavings + currentTotalStock;
+
+        records.push({ 
+            month, salary, savingsInput, stockInput, 
+            currentTotalSavings, currentTotalStock, totalAsset, monthlyStockProfit
+        });
+
+        localStorage.setItem('proAssetData', JSON.stringify(records));
+        alert('저장 완료! 리포트가 업데이트되었습니다.');
+        
+        // 입력창 초기화
+        document.querySelectorAll('input').forEach(input => input.value = (input.type === 'number' ? '0' : ''));
+        
+        renderDashboard();
     }
 
-    function renderHistory() {
-        let records = JSON.parse(localStorage.getItem('myAssetData')) || [];
+    function renderDashboard() {
+        let records = JSON.parse(localStorage.getItem('proAssetData')) || [];
+        
+        // 1. 표 그리기
         const tbody = document.getElementById('historyTable');
         tbody.innerHTML = '';
-        let totalPrincipal = 0;
-
-        records.forEach(record => {
+        
+        records.forEach(r => {
+            let profitClass = r.monthlyStockProfit >= 0 ? 'profit' : 'loss';
+            let profitSign = r.monthlyStockProfit > 0 ? '+' : '';
+            
             let row = `<tr>
-                <td>${record.month}</td>
-                <td>${record.salary.toLocaleString()}</td>
-                <td>${record.savings.toLocaleString()}</td>
-                <td>${record.stock.toLocaleString()}</td>
+                <td>${r.month}</td>
+                <td>${r.salary.toLocaleString()}</td>
+                <td>${(r.savingsInput + r.stockInput).toLocaleString()}</td>
+                <td>${r.currentTotalStock.toLocaleString()}</td>
+                <td><strong>${r.totalAsset.toLocaleString()}</strong></td>
+                <td class="${profitClass}">${profitSign}${r.monthlyStockProfit.toLocaleString()}</td>
             </tr>`;
             tbody.innerHTML += row;
-            totalPrincipal += (record.savings + record.stock);
         });
-        document.getElementById('totalPrincipal').innerText = totalPrincipal.toLocaleString();
+
+        // 2. 그래프 그리기
+        drawChart(records);
+
+        // 3. 연말 정산 리포트 계산
+        if (records.length > 0) {
+            document.getElementById('yearEndSummary').style.display = 'block';
+            
+            let sumSalary = records.reduce((sum, r) => sum + r.salary, 0);
+            let sumInvest = records.reduce((sum, r) => sum + r.savingsInput + r.stockInput, 0);
+            let sumStockInvest = records.reduce((sum, r) => sum + r.stockInput, 0);
+
+            const firstRecord = records[0];
+            const lastRecord = records[records.length - 1];
+
+            // 연말(현재) 주식 수익금 = 연말 주식평가액 - (연초 주식평가액 + 총 주식투자원금)
+            // (첫 달 입력 전 원래 가지고 있던 주식이 0원이라고 가정. 만약 첫달 평가액이 이미 포함된거라면 첫달 입력값을 연초로 봄)
+            let annualStockProfit = lastRecord.currentTotalStock - (firstRecord.currentTotalStock - firstRecord.stockInput + sumStockInvest);
+
+            // 전재산 기준 주식 수익률 = (1년 주식 수익금 / 연말 전재산) * 100
+            let stockYieldTotal = lastRecord.totalAsset > 0 ? (annualStockProfit / lastRecord.totalAsset) * 100 : 0;
+
+            // 자산 증가
+            let startAsset = firstRecord.totalAsset - firstRecord.savingsInput - firstRecord.stockInput; // 입력 전 순수 시작 자산
+            if(startAsset < 0) startAsset = 0;
+            
+            let endAsset = lastRecord.totalAsset;
+            let assetGrowthAmount = endAsset - startAsset;
+            let assetGrowthRate = startAsset > 0 ? (assetGrowthAmount / startAsset) * 100 : 0;
+
+            // 화면에 값 넣기
+            document.getElementById('sumSalary').innerText = sumSalary.toLocaleString() + ' 원';
+            document.getElementById('sumInvest').innerText = sumInvest.toLocaleString() + ' 원';
+            
+            document.getElementById('annualStockProfit').innerText = annualStockProfit.toLocaleString() + ' 원';
+            document.getElementById('annualStockProfit').className = annualStockProfit >= 0 ? 'highlight profit' : 'highlight loss';
+            document.getElementById('stockYieldTotal').innerText = stockYieldTotal.toFixed(2) + ' %';
+            
+            document.getElementById('startAsset').innerText = startAsset.toLocaleString() + ' 원';
+            document.getElementById('endAsset').innerText = endAsset.toLocaleString() + ' 원';
+            document.getElementById('assetGrowthAmount').innerText = assetGrowthAmount.toLocaleString() + ' 원';
+            document.getElementById('assetGrowthRate').innerText = assetGrowthRate.toFixed(2) + ' %';
+
+        } else {
+            document.getElementById('yearEndSummary').style.display = 'none';
+        }
+    }
+
+    function drawChart(records) {
+        const ctx = document.getElementById('assetChart').getContext('2d');
+        const labels = records.map(r => r.month);
+        const dataAssets = records.map(r => r.totalAsset);
+
+        if (myChart) { myChart.destroy(); } // 기존 그래프 지우고 새로 그리기
+
+        myChart = new Chart(ctx, {
+            type: 'line',
+            data: {
+                labels: labels,
+                datasets: [{
+                    label: '총 자산 흐름 (원)',
+                    data: dataAssets,
+                    borderColor: '#3182ce',
+                    backgroundColor: 'rgba(49, 130, 206, 0.2)',
+                    borderWidth: 2,
+                    fill: true,
+                    tension: 0.3,
+                    pointBackgroundColor: '#2b6cb0'
+                }]
+            },
+            options: { responsive: true, maintainAspectRatio: false }
+        });
     }
 
     function clearData() {
         if(confirm('정말 모든 기록을 지우시겠습니까? 복구할 수 없습니다.')) {
-            localStorage.removeItem('myAssetData');
-            renderHistory();
-            document.getElementById('resultSection').style.display = 'none';
+            localStorage.removeItem('proAssetData');
+            renderDashboard();
         }
-    }
-
-    function calculatePortfolio() {
-        let records = JSON.parse(localStorage.getItem('myAssetData')) || [];
-        let totalInvested = records.reduce((sum, record) => sum + record.savings + record.stock, 0);
-        
-        const currentSavings = Number(document.getElementById('currentSavings').value);
-        const currentStock = Number(document.getElementById('currentStock').value);
-        const targetAsset = Number(document.getElementById('targetAsset').value);
-
-        const totalAsset = currentSavings + currentStock; 
-        const netProfit = totalAsset - totalInvested; 
-        
-        let growthRate = 0;
-        let roi = 0;
-        if (totalInvested > 0) {
-            growthRate = ((totalAsset - totalInvested) / totalInvested) * 100;
-            roi = (netProfit / totalInvested) * 100; 
-        }
-
-        const shortfall = targetAsset - totalAsset; 
-        
-        let requiredROI = 0;
-        if (totalInvested > 0 && targetAsset > totalInvested) {
-            requiredROI = ((targetAsset - totalInvested) / totalInvested) * 100;
-        }
-
-        document.getElementById('resTotalInvest').innerText = totalInvested.toLocaleString();
-        document.getElementById('resTotalAsset').innerText = totalAsset.toLocaleString();
-        document.getElementById('resNetProfit').innerText = netProfit.toLocaleString();
-        document.getElementById('resGrowthRate').innerText = growthRate.toFixed(2);
-        document.getElementById('resROI').innerText = roi.toFixed(2);
-        document.getElementById('resTarget').innerText = targetAsset.toLocaleString();
-        
-        if (shortfall > 0) {
-            document.getElementById('resShortfall').innerText = shortfall.toLocaleString();
-        } else {
-            document.getElementById('resShortfall').innerText = "0 (목표 달성! 🎉)";
-        }
-        document.getElementById('resRequiredROI').innerText = requiredROI.toFixed(2);
-        document.getElementById('resultSection').style.display = 'block';
     }
 </script>
 </body>
